@@ -15,7 +15,7 @@ const server = createServer(app);
 
 // Initializing socket.io server
 const io = new Server(server, {
-    cors: { origin: '*' }
+    cors: { origin: process.env.CLIENT_URL || '*' }
 });
 
 // Store online users: { userId: socketId }
@@ -39,12 +39,21 @@ io.on('connection', (socket) => {
 });
 
 app.use(cors({
-    origin: function(origin, callback) {
-        if(!origin) return callback(null, true);
-        if(origin.startsWith('http://localhost:') || origin.startsWith('http://127.0.0.1:')) {
+    origin: function (origin, callback) {
+        if (!origin) return callback(null, true);
+
+        const allowed = [
+            'http://localhost:5173',
+            'http://localhost:3000',
+            'http://127.0.0.1:5173',
+            process.env.CLIENT_URL
+        ].filter(Boolean);
+
+        if (allowed.some(url => origin.startsWith(url))) {
             return callback(null, true);
         }
-        return callback(new Error('CORS blocked origin ' + origin), false);
+
+        return callback(new Error("CORS blocked origin" + origin), false);
     },
     credentials: true,
 }));
@@ -59,7 +68,7 @@ app.use('/api/auth', authRoute);
 app.use('/update-profile', profileRoute);
 app.use('/api/message', messageRoute);
 
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 server.listen(PORT, () => {
     console.log(`Server is running on ${PORT}`);
