@@ -1,0 +1,479 @@
+/* ============================================================
+   NEXUS CHAT — Global Design System
+   Soft Aesthetic Theme (Lavender / Rose / Sage)
+   ============================================================ */
+
+/* ---------- Google Fonts are loaded via index.html ---------- */
+
+/* ---------- CSS Custom Properties (Design Tokens) ----------- */
+:root {
+  /* ── Core Soft Palette ── */
+  --color-bg-base: rgb(26, 22, 37);
+  --color-bg-surface: #231D31;
+  --color-bg-elevated: #2D2640;
+  --color-bg-hover: #382F4C;
+  --color-bg-glass: rgba(35, 29, 49, 0.75);
+
+  /* ── Brand Lavender ── */
+  --color-primary: #9B7FD4;
+  --color-primary-light: #B8A0E8;
+  --color-primary-dark: #7C5FBF;
+  --color-primary-glow: rgba(155, 127, 212, 0.25);
+
+  /* ── Accent Rose ── */
+  --color-accent: #D4A0C0;
+  --color-accent-light: #E8BFD8;
+  --color-accent-glow: rgba(212, 160, 192, 0.2);
+
+  /* ── Gradients ── */
+  --gradient-brand: linear-gradient(135deg, #9B7FD4 0%, #D4A0C0 100%);
+  --gradient-brand-soft: linear-gradient(135deg, rgba(155, 127, 212, 0.1) 0%, rgba(212, 160, 192, 0.1) 100%);
+  --gradient-surface: linear-gradient(180deg, #231D31 0%, #1A1625 100%);
+  --gradient-card: linear-gradient(145deg, rgba(35, 29, 49, 0.95) 0%, rgba(26, 22, 37, 0.95) 100%);
+
+  /* ── Text ── */
+  --color-text-primary: #E2DCE8;
+  --color-text-secondary: #A89BB8;
+  --color-text-muted: #7A6E8A;
+  --color-text-accent: #B8A0E8;
+
+  /* ── Status ── */
+  --color-online: #6BC9A0;
+  --color-offline: #7A6E8A;
+  --color-error: #D97B8F;
+  --color-warning: #D4B07A;
+  --color-success: #6BC9A0;
+
+  /* ── Borders ── */
+  --color-border: rgba(155, 127, 212, 0.2);
+  --color-border-subtle: rgba(155, 127, 212, 0.08);
+  --color-border-focus: rgba(155, 127, 212, 0.45);
+
+  /* ── Spacing ── */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+
+  /* ── Radii ── */
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-lg: 18px;
+  --radius-xl: 24px;
+  --radius-2xl: 32px;
+  --radius-full: 9999px;
+
+  /* ── Shadows (soft, diffused, tinted) ── */
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.15);
+  --shadow-md: 0 4px 20px rgba(0, 0, 0, 0.2);
+  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.25);
+  --shadow-primary: 0 4px 16px rgba(155, 127, 212, 0.15), 0 2px 6px rgba(155, 127, 212, 0.1);
+  --shadow-accent: 0 4px 16px var(--color-accent-glow), 0 2px 6px rgba(212, 160, 192, 0.1);
+  --shadow-glass: 0 8px 32px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+
+  /* ── Typography ── */
+  --font-sans: 'Inter', system-ui, sans-serif;
+  --font-display: 'Outfit', system-ui, sans-serif;
+
+  /* ── Transitions ── */
+  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-base: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 400ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-spring: 350ms cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* ── Layout ── */
+  --sidebar-width: 300px;
+  --navbar-height: 60px;
+
+  /* ── Chat-specific tokens ── */
+  --chat-bg: #1A1625;
+  --chat-sidebar-bg: #231D31;
+  --chat-header-bg: #231D31;
+  --chat-input-bg: #2D2640;
+  --chat-msg-sent: linear-gradient(135deg, rgba(155, 127, 212, 0.15) 0%, rgba(184, 160, 232, 0.1) 100%);
+  --chat-msg-sent-flat: rgba(155, 127, 212, 0.25);
+  --chat-msg-received: #2D2640;
+  --chat-send-btn: var(--gradient-brand);
+  --chat-send-btn-flat: #9B7FD4;
+  --chat-send-btn-hover: #B8A0E8;
+  --chat-border: rgba(155, 127, 212, 0.15);
+  --chat-user-active: rgba(155, 127, 212, 0.15);
+  --chat-user-hover: rgba(155, 127, 212, 0.08);
+}
+
+/* ---------- Reset & Base ----------- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--color-bg-base);
+  color: var(--color-text-primary);
+  line-height: 1.6;
+  min-height: 100vh;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+button {
+  cursor: pointer;
+  font-family: inherit;
+  border: none;
+  background: none;
+  outline: none;
+}
+
+input,
+textarea {
+  font-family: inherit;
+  outline: none;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* ---------- Scrollbar ----------- */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(155, 127, 212, 0.2);
+  border-radius: var(--radius-full);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(155, 127, 212, 0.4);
+}
+
+/* ---------- Utility ----------- */
+.text-gradient {
+  background: var(--gradient-brand);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.glass-card {
+  background: var(--color-bg-glass);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--color-border-subtle);
+  box-shadow: var(--shadow-glass);
+}
+
+/* ---------- Buttons ----------- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-6);
+  border-radius: var(--radius-md);
+  font-size: 0.875rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  transition: all var(--transition-base);
+  position: relative;
+  overflow: hidden;
+}
+
+.btn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0);
+  transition: background var(--transition-fast);
+}
+
+.btn:hover::after {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.btn:active::after {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.btn-primary {
+  background: var(--gradient-brand);
+  color: #fff;
+  box-shadow: var(--shadow-primary);
+}
+
+.btn-primary:hover {
+  box-shadow: 0 6px 24px rgba(155, 127, 212, 0.3);
+  transform: translateY(-1px);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--color-text-secondary);
+  border: 1px solid var(--color-border-subtle);
+}
+
+.btn-ghost:hover {
+  color: var(--color-text-primary);
+  border-color: var(--color-border);
+  background: var(--color-bg-hover);
+}
+
+.btn-danger {
+  background: rgba(217, 123, 143, 0.1);
+  color: var(--color-error);
+  border: 1px solid rgba(217, 123, 143, 0.2);
+}
+
+.btn-danger:hover {
+  background: rgba(217, 123, 143, 0.18);
+}
+
+/* ---------- Form Elements ----------- */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.form-label {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  letter-spacing: 0.02em;
+}
+
+.form-input {
+  width: 100%;
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-md);
+  color: var(--color-text-primary);
+  font-size: 0.9375rem;
+  transition: all var(--transition-base);
+}
+
+.form-input::placeholder {
+  color: var(--color-text-muted);
+}
+
+.form-input:focus {
+  border-color: var(--color-border-focus);
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(155, 127, 212, 0.1);
+}
+
+.form-input:hover:not(:focus) {
+  border-color: var(--color-border);
+}
+
+/* ---------- Background Orbs ----------- */
+.bg-orb {
+  position: fixed;
+  border-radius: 50%;
+  filter: blur(80px);
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.4;
+}
+
+.bg-orb-1 {
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(184, 160, 232, 0.5) 0%, transparent 70%);
+  top: -150px;
+  left: -100px;
+  animation: orbFloat1 12s ease-in-out infinite;
+}
+
+.bg-orb-2 {
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(212, 160, 192, 0.4) 0%, transparent 70%);
+  bottom: -100px;
+  right: -80px;
+  animation: orbFloat2 15s ease-in-out infinite;
+}
+
+.bg-orb-3 {
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(circle, rgba(155, 127, 212, 0.3) 0%, transparent 70%);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  animation: orbFloat3 10s ease-in-out infinite;
+}
+
+@keyframes orbFloat1 {
+
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+
+  33% {
+    transform: translate(40px, 30px) scale(1.05);
+  }
+
+  66% {
+    transform: translate(-20px, 15px) scale(0.95);
+  }
+}
+
+@keyframes orbFloat2 {
+
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+
+  50% {
+    transform: translate(-30px, -20px) scale(1.08);
+  }
+}
+
+@keyframes orbFloat3 {
+
+  0%,
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0.25;
+  }
+
+  50% {
+    transform: translate(-50%, -50%) scale(1.2);
+    opacity: 0.08;
+  }
+}
+
+/* ---------- Page Layout ----------- */
+.page-container {
+  min-height: 100vh;
+  position: relative;
+  overflow: hidden;
+}
+
+/* ---------- Loading Spinner ----------- */
+.spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(155, 127, 212, 0.2);
+  border-top-color: var(--color-primary);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+.spinner-lg {
+  width: 40px;
+  height: 40px;
+  border-width: 3px;
+  border-color: var(--color-border-subtle);
+  border-top-color: var(--color-primary);
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ---------- Empty State ----------- */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4);
+  height: 100%;
+  color: var(--color-text-muted);
+  text-align: center;
+  padding: var(--space-8);
+}
+
+.empty-state-icon {
+  font-size: 3rem;
+  opacity: 0.5;
+  color: var(--color-primary-light);
+}
+
+.empty-state h3 {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+}
+
+.empty-state p {
+  font-size: 0.9rem;
+  max-width: 280px;
+  line-height: 1.7;
+}
+
+/* ---------- Badge ----------- */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 var(--space-1);
+  background: var(--gradient-brand);
+  border-radius: var(--radius-full);
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #fff;
+  line-height: 1;
+}
+
+/* ---------- SVG Icon Utility ----------- */
+.icon-svg {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.icon-svg svg {
+  display: block;
+}
