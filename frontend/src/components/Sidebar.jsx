@@ -92,10 +92,10 @@ function MyProfilePanel({ onClose }) {
   const { addToast } = useToast();
 
   const [fullName, setFullName] = useState(authUser?.fullName || '');
-  const [bio, setBio]           = useState(authUser?.bio || '');
+  const [bio, setBio] = useState(authUser?.bio || '');
   const [profilePic, setProfilePic] = useState(null);
   const [picPreview, setPicPreview] = useState(authUser?.profilePic || null);
-  const [loading, setLoading]   = useState(false);
+  const [loading, setLoading] = useState(false);
   const fileRef = useRef(null);
 
   const handleImageChange = (e) => {
@@ -249,9 +249,9 @@ function MyProfilePanel({ onClose }) {
 function Sidebar() {
   const { users, selectedUser, selectUser, onlineUsers, unseenMessages, isLoadingUsers, pinChat, deleteChat } = useChat();
   const { authUser } = useAuth();
-  const [search, setSearch]               = useState('');
+  const [search, setSearch] = useState('');
   const [showMyProfile, setShowMyProfile] = useState(false);
-  const [sidebarWidth, setSidebarWidth] = useState(300);
+  const [sidebarWidth, setSidebarWidth] = useState(420);
   const [isResizing, setIsResizing] = useState(false);
   const [openDropdownId, setOpenDropdownId] = useState(null);
   const dropdownRef = useRef(null);
@@ -350,7 +350,7 @@ function Sidebar() {
           <AnimatePresence>
             {filteredUsers.map((user) => {
               const isOnline = onlineUsers.includes(user._id);
-              const unseen   = unseenMessages[user._id] || 0;
+              const unseen = unseenMessages[user._id] || 0;
               const isActive = selectedUser?._id === user._id;
 
               return (
@@ -476,7 +476,7 @@ function Sidebar() {
           <MyProfilePanel onClose={() => setShowMyProfile(false)} />
         )}
       </AnimatePresence>
-      <div 
+      <div
         className={`sidebar-resizer ${isResizing ? 'is-resizing' : ''}`}
         onMouseDown={startResizing}
       />
