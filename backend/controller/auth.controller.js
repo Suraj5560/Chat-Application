@@ -4,22 +4,31 @@ import { generateToken } from '../lib/utlis.js';
 
 
 async function signUp(req, res) {
-    const { fullName, email, password, bio } = req.body;
+    const { fullName, username, email, password } = req.body;
 
     try {
-        if (!fullName || !email || !password || !bio) {
+        if (!fullName || !username || !email || !password) {
             return res.json({
                 success: false,
-                message: 'missing details'
+                message: 'Please fill in all fields'
             });
         }
 
-        const user = await userModel.findOne({ email });
-
-        if (user) {
+        // Check if email already taken
+        const existingEmail = await userModel.findOne({ email });
+        if (existingEmail) {
             return res.json({
                 success: false,
-                message: 'User already exists'
+                message: 'Email already in use'
+            });
+        }
+
+        // Check if username already taken
+        const existingUsername = await userModel.findOne({ username: username.toLowerCase().trim() });
+        if (existingUsername) {
+            return res.json({
+                success: false,
+                message: 'Username already taken'
             });
         }
 
@@ -27,7 +36,7 @@ async function signUp(req, res) {
         const hash = await bcrypt.hash(password, salt);
 
         const newUser = await userModel.create({
-            fullName, email, password: hash, bio
+            fullName, username: username.toLowerCase().trim(), email, password: hash
         });
 
         const token = generateToken(newUser._id);

@@ -8,13 +8,13 @@ const getUserForSidebar = async (req, res) => {
     try {
         const userId = req.user._id;
 
-        // 1. Find all messages where current user is sender or receiver AND not deleted by them
+        // Find all messages where current user is sender or receiver AND not deleted by them
         const messages = await messageModel.find({
             $or: [{ senderId: userId }, { recevierId: userId }],
             deletedBy: { $ne: userId }
         }).select('senderId recevierId');
 
-        // 2. Extract unique user IDs from those messages + pinned chats
+        // Extract unique user IDs
         const uniqueUserIds = new Set();
         messages.forEach(msg => {
             if (msg.senderId.toString() !== userId.toString()) {
@@ -24,28 +24,27 @@ const getUserForSidebar = async (req, res) => {
                 uniqueUserIds.add(msg.recevierId.toString());
             }
         });
-        
-        // Also always include pinned users so they don't disappear
+
+        // Always include pinned users so they don't disappear
         const pinnedChats = req.user.pinnedChats || [];
         pinnedChats.forEach(id => uniqueUserIds.add(id.toString()));
 
-        // 3. Fetch user details for those unique IDs
+        // Fetch user details
         let filterUser = await userModel.find({ _id: { $in: Array.from(uniqueUserIds) } }).select('-password').lean();
 
-        // 4. Attach isPinned status and sort (pinned first)
+        // Attach isPinned and sort
         filterUser = filterUser.map(user => ({
             ...user,
             isPinned: pinnedChats.some(pinnedId => pinnedId.toString() === user._id.toString())
         }));
-        
         filterUser.sort((a, b) => (b.isPinned === a.isPinned) ? 0 : b.isPinned ? 1 : -1);
 
-        // Count number of unseen messages (ignoring deleted ones)
+        // Count unseen messages
         const unseenmessages = {};
         const promises = filterUser.map(async (user) => {
-            const unreadMessages = await messageModel.find({ 
-                senderId: user._id, 
-                recevierId: userId, 
+            const unreadMessages = await messageModel.find({
+                senderId: user._id,
+                recevierId: userId,
                 seen: false,
                 deletedBy: { $ne: userId }
             });
@@ -55,20 +54,36 @@ const getUserForSidebar = async (req, res) => {
         });
 
         await Promise.all(promises);
-        res.json({
-            success: true,
-            users: filterUser,
-            unseenmessages
-        });
+        res.json({ success: true, users: filterUser, unseenmessages });
 
-    } catch (error) {
-        console.log(error.message);
-        res.json({
-            success: false,
-            message: error.message
-        });
+    } catch (err) {
+        console.log(err.message);
+        res.json({ success: false, message: err.message });
     }
 };
+
+// Search users by username for New Chat modal
+const searchUsers = async (req, res) => {
+    try {
+        const { q } = req.query;
+        const myId = req.user._id;
+
+        if (!q || q.trim() === '') {
+            return res.json({ success: true, users: [] });
+        }
+
+        const users = await userModel.find({
+            _id: { $ne: myId },
+            username: { $regex: q.trim(), $options: 'i' }
+        }).select('-password').limit(20).lean();
+
+        res.json({ success: true, users });
+    } catch (err) {
+        console.log(err.message);
+        res.json({ success: false, message: err.message });
+    }
+};
+
 
 // Get all messages for a selected user
 const getMessages = async (req, res) => {
@@ -199,4 +214,4 @@ const deleteConversation = async (req, res) => {
     }
 };
 
-export { getUserForSidebar, getMessages, markMessageAsSeen, sendMessage, togglePinChat, deleteConversation };
+export { getUserForSidebar, getMessages, markMessageAsSeen, sendMessage, togglePinChat, deleteConversation, searchUsers };
