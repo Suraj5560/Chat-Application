@@ -1,10 +1,11 @@
 import express from 'express';
 import { authMiddleware } from '../middleware/auth.middleware.js';
-import { getUserForSidebar, getMessages, markMessageAsSeen, sendMessage, togglePinChat, deleteConversation } from '../controller/message.controller.js';
+import { getUserForSidebar, getMessages, markMessageAsSeen, sendMessage, togglePinChat, deleteConversation, searchUsers } from '../controller/message.controller.js';
 
 const route = express.Router();
 
 route.get('/sidebar-users', authMiddleware, getUserForSidebar);
+route.get('/search-users', authMiddleware, searchUsers);
 route.get('/:id', authMiddleware, getMessages);
 route.post('/:id', authMiddleware, sendMessage);          // added: was missing from routes
 route.put('/mark/:id', authMiddleware, markMessageAsSeen);

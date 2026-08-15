@@ -1,10 +1,17 @@
 import mongoose from 'mongoose';
 
-// Fixed: removed duplicate email field, added password field
 const userSchema = new mongoose.Schema({
     fullName: {
         type: String,
         required: true,
+    },
+    username: {
+        type: String,
+        required: true,
+        unique: true,
+        trim: true,
+        lowercase: true,
+        minlength: 3,
     },
     email: {
         type: String,
