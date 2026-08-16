@@ -38,18 +38,26 @@ function SignUpPage({ onSwitchToLogin }) {
   const { signUp }   = useAuth();
   const { addToast } = useToast();
 
-  const [form, setForm]     = useState({ fullName: '', email: '', password: '', bio: '' });
+  const [form, setForm] = useState({ fullName: '', username: '', email: '', password: '' });
   const [loading, setLoading] = useState(false);
-  const [error, setError]   = useState('');
+  const [error, setError] = useState('');
 
   const handleChange = (e) =>
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const { fullName, email, password, bio } = form;
-    if (!fullName || !email || !password || !bio) {
+    const { fullName, username, email, password } = form;
+    if (!fullName || !username || !email || !password) {
       setError('Please fill in all fields.');
+      return;
+    }
+    if (username.length < 3) {
+      setError('Username must be at least 3 characters.');
+      return;
+    }
+    if (!/^[a-zA-Z0-9_]+$/.test(username)) {
+      setError('Username can only contain letters, numbers and underscores.');
       return;
     }
     if (password.length < 6) {
@@ -59,7 +67,7 @@ function SignUpPage({ onSwitchToLogin }) {
     setError('');
     setLoading(true);
     try {
-      const data = await signUp(fullName, email, password, bio);
+      const data = await signUp(fullName, username, email, password);
       if (!data.success) {
         setError(data.message || 'Registration failed.');
         addToast(data.message || 'Registration failed.', 'error');
@@ -152,6 +160,21 @@ function SignUpPage({ onSwitchToLogin }) {
             </div>
 
             <div className="form-group">
+              <label className="form-label" htmlFor="signup-username">Username</label>
+              <input
+                id="signup-username"
+                name="username"
+                className="form-input"
+                type="text"
+                placeholder="e.g. john_doe (letters, numbers, _)"
+                value={form.username}
+                onChange={handleChange}
+                autoComplete="username"
+                required
+              />
+            </div>
+
+            <div className="form-group">
               <label className="form-label" htmlFor="signup-email">Email</label>
               <input
                 id="signup-email"
@@ -181,19 +204,6 @@ function SignUpPage({ onSwitchToLogin }) {
               />
             </div>
 
-            <div className="form-group">
-              <label className="form-label" htmlFor="signup-bio">Bio</label>
-              <input
-                id="signup-bio"
-                name="bio"
-                className="form-input"
-                type="text"
-                placeholder="A short bio about yourself"
-                value={form.bio}
-                onChange={handleChange}
-                required
-              />
-            </div>
 
             <button
               id="btn-signup-submit"
