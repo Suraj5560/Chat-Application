@@ -69,7 +69,13 @@ const searchUsers = async (req, res) => {
         const myId = req.user._id;
 
         if (!q || q.trim() === '') {
-            return res.json({ success: true, users: [] });
+            // If no search query, return all online users (except self)
+            const onlineUserIds = Object.keys(userSocketMap).filter(id => id !== myId.toString());
+            const users = await userModel.find({
+                _id: { $in: onlineUserIds }
+            }).select('-password').limit(20).lean();
+
+            return res.json({ success: true, users });
         }
 
         const users = await userModel.find({

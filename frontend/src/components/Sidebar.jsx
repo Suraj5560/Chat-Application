@@ -320,7 +320,6 @@ function Sidebar() {
   // Debounced search for New Chat modal
   useEffect(() => {
     if (!showNewChat) return;
-    if (!newChatQuery.trim()) { setNewChatResults([]); return; }
     const timer = setTimeout(async () => {
       setNewChatLoading(true);
       const results = await searchUsers(newChatQuery);
@@ -540,7 +539,7 @@ function Sidebar() {
                   </div>
                 ) : newChatResults.length === 0 ? (
                   <div className="empty-state" style={{ padding: '1.5rem' }}>
-                    <p style={{ opacity: 0.5 }}>Type a username to find people</p>
+                    <p style={{ opacity: 0.5 }}>No users online. Search to find people.</p>
                   </div>
                 ) : (
                   newChatResults.map((user) => {
