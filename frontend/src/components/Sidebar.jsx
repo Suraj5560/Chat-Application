@@ -247,7 +247,7 @@ function MyProfilePanel({ onClose }) {
 
 /* ── Sidebar ─────────────────────────────────────────────── */
 function Sidebar() {
-  const { users, selectedUser, selectUser, onlineUsers, unseenMessages, isLoadingUsers, pinChat, deleteChat } = useChat();
+  const { users, selectedUser, selectUser, onlineUsers, unseenMessages, isLoadingUsers, pinChat, deleteChat, searchUsers } = useChat();
   const { authUser } = useAuth();
   const [search, setSearch] = useState('');
   const [showMyProfile, setShowMyProfile] = useState(false);
@@ -255,6 +255,13 @@ function Sidebar() {
   const [isResizing, setIsResizing] = useState(false);
   const [openDropdownId, setOpenDropdownId] = useState(null);
   const dropdownRef = useRef(null);
+
+  // New Chat modal state
+  const [showNewChat, setShowNewChat] = useState(false);
+  const [newChatQuery, setNewChatQuery] = useState('');
+  const [newChatResults, setNewChatResults] = useState([]);
+  const [newChatLoading, setNewChatLoading] = useState(false);
+  const newChatInputRef = useRef(null);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -306,9 +313,22 @@ function Sidebar() {
   const filteredUsers = useMemo(() => {
     const q = search.toLowerCase();
     return users.filter((u) =>
-      u.fullName.toLowerCase().includes(q) || (u.bio || '').toLowerCase().includes(q)
+      u.fullName.toLowerCase().includes(q) || (u.username || '').toLowerCase().includes(q)
     );
   }, [users, search]);
+
+  // Debounced search for New Chat modal
+  useEffect(() => {
+    if (!showNewChat) return;
+    if (!newChatQuery.trim()) { setNewChatResults([]); return; }
+    const timer = setTimeout(async () => {
+      setNewChatLoading(true);
+      const results = await searchUsers(newChatQuery);
+      setNewChatResults(results);
+      setNewChatLoading(false);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [newChatQuery, showNewChat, searchUsers]);
 
   return (
     <div className="sidebar" style={{ width: sidebarWidth, minWidth: sidebarWidth }}>
@@ -316,7 +336,11 @@ function Sidebar() {
       <div className="sidebar-header">
         <div className="sidebar-logo">
           <span className="sidebar-logo-text">Chats</span>
-          <button className="sidebar-compose-btn" title="New chat">
+          <button
+            className="sidebar-compose-btn"
+            title="New chat"
+            onClick={() => { setShowNewChat(true); setNewChatQuery(''); setNewChatResults([]); setTimeout(() => newChatInputRef.current?.focus(), 50); }}
+          >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
               <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
@@ -367,9 +391,6 @@ function Sidebar() {
 
                   <div className="user-item-info">
                     <div className="user-item-name">{user.fullName}</div>
-                    <div className="user-item-status">
-                      {user.bio || 'Available'}
-                    </div>
                   </div>
 
                   {/* Right-side section: pin indicator + badge (default) / chevron (hover) */}
@@ -469,6 +490,81 @@ function Sidebar() {
           </button>
         </div>
       </div>
+
+      {/* New Chat Modal */}
+      <AnimatePresence>
+        {showNewChat && (
+          <motion.div
+            className="new-chat-overlay"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setShowNewChat(false)}
+          >
+            <motion.div
+              className="new-chat-modal"
+              initial={{ opacity: 0, y: -20, scale: 0.97 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -20, scale: 0.97 }}
+              transition={{ duration: 0.2 }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="new-chat-header">
+                <h3>New Chat</h3>
+                <button className="icon-btn" onClick={() => setShowNewChat(false)}>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                    <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                  </svg>
+                </button>
+              </div>
+              <div className="new-chat-search">
+                <span className="sidebar-search-icon"><SearchIcon /></span>
+                <input
+                  ref={newChatInputRef}
+                  className="sidebar-search-input"
+                  type="text"
+                  placeholder="Search by username..."
+                  value={newChatQuery}
+                  onChange={(e) => setNewChatQuery(e.target.value)}
+                  autoComplete="off"
+                />
+              </div>
+              <div className="new-chat-results">
+                {newChatLoading ? (
+                  <div style={{ display: 'flex', justifyContent: 'center', padding: '1.5rem' }}>
+                    <div className="spinner" />
+                  </div>
+                ) : newChatResults.length === 0 && newChatQuery.trim() ? (
+                  <div className="empty-state" style={{ padding: '1.5rem' }}>
+                    <p>No users found for &quot;{newChatQuery}&quot;</p>
+                  </div>
+                ) : newChatResults.length === 0 ? (
+                  <div className="empty-state" style={{ padding: '1.5rem' }}>
+                    <p style={{ opacity: 0.5 }}>Type a username to find people</p>
+                  </div>
+                ) : (
+                  newChatResults.map((user) => {
+                    const isOnline = onlineUsers.includes(user._id);
+                    return (
+                      <div
+                        key={user._id}
+                        className="user-item"
+                        onClick={() => { selectUser(user); setShowNewChat(false); }}
+                        style={{ cursor: 'pointer' }}
+                      >
+                        <UserAvatar user={user} size={42} showOnline isOnline={isOnline} />
+                        <div className="user-item-info">
+                          <span className="user-item-name">{user.fullName}</span>
+                        </div>
+                      </div>
+                    );
+                  })
+                )}
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* My Profile Panel — slides in over the sidebar content */}
       <AnimatePresence>
