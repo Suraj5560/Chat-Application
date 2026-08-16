@@ -49,8 +49,8 @@ export function AuthProvider({ children }) {
     return data;
   }, []);
 
-  const signUp = useCallback(async (fullName, email, password, bio) => {
-    const { data } = await axiosInstance.post('/api/auth/signUp', { fullName, email, password, bio });
+  const signUp = useCallback(async (fullName, username, email, password) => {
+    const { data } = await axiosInstance.post('/api/auth/signUp', { fullName, username, email, password });
     if (data.success) {
       localStorage.setItem('token', data.token);
       setAuthUser(data.userData);

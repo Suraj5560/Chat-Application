@@ -157,6 +157,17 @@ export function ChatProvider({ children }) {
     }
   }, [selectedUser, fetchUsers]);
 
+  // Search users by username for New Chat modal
+  const searchUsers = useCallback(async (query) => {
+    try {
+      const { data } = await axiosInstance.get(`/api/message/search-users?q=${encodeURIComponent(query)}`);
+      return data.success ? data.users : [];
+    } catch (err) {
+      console.error('searchUsers error:', err);
+      return [];
+    }
+  }, []);
+
   // Load users when auth user changes
   useEffect(() => {
     if (authUser) fetchUsers();
@@ -181,6 +192,7 @@ export function ChatProvider({ children }) {
       sendMessage,
       pinChat,
       deleteChat,
+      searchUsers,
     }}>
       {children}
     </ChatContext.Provider>
