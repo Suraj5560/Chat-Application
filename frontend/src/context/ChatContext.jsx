@@ -37,8 +37,7 @@ export function ChatProvider({ children }) {
     }
 
     const socket = io(SOCKET_URL, {
-      query: { userId: authUser._id },
-      transports: ['websocket'],
+      query: { userId: authUser._id }
     });
 
     socketRef.current = socket;
